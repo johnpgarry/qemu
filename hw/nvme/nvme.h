@@ -206,6 +206,7 @@ typedef struct NvmeNamespaceParams {
     uint16_t atomic_nabspf;
     uint16_t atomic_noiob;
     bool     atomic_nsfeat;
+    bool     atomic_nsfeat_mam;
 } NvmeNamespaceParams;
 
 typedef struct NvmeNamespace {

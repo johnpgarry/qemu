@@ -95,19 +95,27 @@ static int nvme_ns_init(NvmeNamespace *ns, Error **errp)
 
     id_ns->mc = NVME_ID_NS_MC_EXTENDED | NVME_ID_NS_MC_SEPARATE;
 
-    /* Atomic */
+    /* Atomic/NSABP */
     if (ns->params.atomic_nsfeat) {
 	id_ns->nsfeat |= 0x2;
 	id_ns->nawun = ns->params.atomic_nawun;
 	id_ns->nawupf = ns->params.atomic_nawupf;
 	id_ns->nacwu = ns->params.atomic_nacwu;
     }
+
+    /* MAM */
+    if (ns->params.atomic_nsfeat_mam && ns->params.atomic_nabspf)
+        id_ns->nsfeat |= 0x20;
+
     id_ns->nabsn = ns->params.atomic_nabsn;
     id_ns->nabo = ns->params.atomic_nabo;
     id_ns->nabspf = ns->params.atomic_nabspf;
     id_ns->noiob = ns->params.atomic_noiob;
 
     printf("Atomic Paramters: NAWUN=%d NAWUPF=%d NABSN=%d NABSPF=%d NABO=%d\n", id_ns->nawun, id_ns->nawupf, id_ns->nabsn, id_ns->nabspf, id_ns->noiob);
+
+    if (id_ns->nsfeat & 0x20)
+        printf("Atomic Paramters: MAM - Supported\n");
 
     if (ms && ns->params.mset) {
         id_ns->flbas |= NVME_ID_NS_FLBAS_EXTENDED;
@@ -820,6 +828,7 @@ static Property nvme_ns_props[] = {
     DEFINE_PROP_UINT16("atomic.nabspf", NvmeNamespace, params.atomic_nabspf, 0),
     DEFINE_PROP_UINT16("atomic.noiob", NvmeNamespace, params.atomic_noiob, 0),
     DEFINE_PROP_BOOL("atomic.nsfeat", NvmeNamespace, params.atomic_nsfeat, 0),
+    DEFINE_PROP_BOOL("atomic.nsfeat_mam", NvmeNamespace, params.atomic_nsfeat_mam, 0),
     DEFINE_PROP_END_OF_LIST(),
 };
 
